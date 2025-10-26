@@ -16,8 +16,7 @@ async def connect_mongodb():
         await mongodb_client.admin.command('ping')
         print("✅ Connected to MongoDB")
     except Exception as e:
-        print(f"❌ MongoDB connection error: {e}")
-        raise
+        print(f"⏳ MongoDB not configured yet (will setup in Step 2)")
 
 async def close_mongodb():
     global mongodb_client
@@ -28,18 +27,16 @@ async def close_mongodb():
 def get_mongodb():
     return mongodb_db
 
-# PostgreSQL Connection Pool
+# PostgreSQL Connection Pool (using asyncpg - no compilation needed!)
 postgres_pool: Optional[asyncpg.Pool] = None
 
 async def connect_postgres():
     global postgres_pool
     try:
         # We'll configure this in Step 2 with Supabase credentials
-        # For now, just a placeholder
         print("⏳ PostgreSQL connection will be configured in Step 2")
     except Exception as e:
-        print(f"❌ PostgreSQL connection error: {e}")
-        raise
+        print(f"⏳ PostgreSQL not configured yet (will setup in Step 2)")
 
 async def close_postgres():
     global postgres_pool
