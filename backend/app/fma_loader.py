@@ -188,8 +188,8 @@ async def main():
     
     loader = FMADatasetLoader()
     
-    # Load tracks (start with 5000, can do more later)
-    await loader.load_tracks(limit=5000)
+    # Load ALL tracks (change this line)
+    await loader.load_tracks(limit=None)  # No limit = ALL tracks!
     
     print("\n✅ All done! Real tracks are loaded.")
 
