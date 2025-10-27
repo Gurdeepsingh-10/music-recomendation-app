@@ -1,6 +1,9 @@
 import asyncpg
+from dotenv import load_dotenv
 from .config import settings
 import asyncio
+import os
+
 
 async def init_postgres_tables():
     """Create PostgreSQL tables for music metadata"""

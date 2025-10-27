@@ -10,7 +10,8 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
     MONGODB_URL: str = os.getenv("MONGODB_URL", "")
-    
+    POSTGRES_URL: str = os.getenv("POSTGRES_URL", "")  # ✅ Add this line
+
     # JWT
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "")
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
