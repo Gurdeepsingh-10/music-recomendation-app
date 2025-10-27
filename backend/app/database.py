@@ -2,6 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional
 from .config import settings
 import asyncpg
+import os 
 
 # MongoDB Connection
 mongodb_client: Optional[AsyncIOMotorClient] = None
@@ -29,14 +30,19 @@ def get_mongodb():
 
 # PostgreSQL Connection Pool (using asyncpg - no compilation needed!)
 postgres_pool: Optional[asyncpg.Pool] = None
-
 async def connect_postgres():
     global postgres_pool
     try:
-        # We'll configure this in Step 2 with Supabase credentials
-        print("⏳ PostgreSQL connection will be configured in Step 2")
+        POSTGRES_URL = os.getenv("POSTGRES_URL")
+        if not POSTGRES_URL:
+            raise ValueError("❌ POSTGRES_URL not found in environment variables")
+
+        postgres_pool = await asyncpg.create_pool(dsn=POSTGRES_URL)
+        async with postgres_pool.acquire() as conn:
+            await conn.execute("SELECT 1;")  # simple ping
+        print("✅ Connected to PostgreSQL (Supabase)")
     except Exception as e:
-        print(f"⏳ PostgreSQL not configured yet (will setup in Step 2)")
+        print(f"❌ Failed to connect to PostgreSQL: {e}")
 
 async def close_postgres():
     global postgres_pool
