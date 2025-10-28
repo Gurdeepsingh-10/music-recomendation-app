@@ -16,7 +16,7 @@ async def get_similar_tracks(
     Get tracks similar to a specific track
     Based on audio features (tempo, energy, etc.)
     """
-    pool = get_postgres()
+    pool = await get_postgres()  # ✅ FIXED
     recommender = get_recommender()
     
     async with pool.acquire() as conn:
@@ -42,6 +42,7 @@ async def get_similar_tracks(
             "algorithm": "content_based_similarity"
         }
 
+
 @router.get("/genre/{genre}")
 async def get_genre_recommendations(
     genre: str,
@@ -49,7 +50,7 @@ async def get_genre_recommendations(
     current_user: dict = Depends(get_current_user)
 ):
     """Get recommendations from a specific genre"""
-    pool = get_postgres()
+    pool = await get_postgres()  # ✅ FIXED
     recommender = get_recommender()
     
     async with pool.acquire() as conn:
@@ -65,13 +66,14 @@ async def get_genre_recommendations(
             "algorithm": "genre_based"
         }
 
+
 @router.get("/popular")
 async def get_popular_recommendations(
     limit: int = 50,
     current_user: dict = Depends(get_current_user)
 ):
     """Get popular tracks (for cold start)"""
-    pool = get_postgres()
+    pool = await get_postgres()  # ✅ FIXED
     recommender = get_recommender()
     
     async with pool.acquire() as conn:
@@ -85,6 +87,7 @@ async def get_popular_recommendations(
             "algorithm": "popularity_based"
         }
 
+
 @router.get("/for-you")
 async def get_personalized_recommendations(
     limit: int = 20,
@@ -94,7 +97,7 @@ async def get_personalized_recommendations(
     Get personalized recommendations based on user's listening history
     Falls back to popular tracks if no history
     """
-    pool = get_postgres()
+    pool = await get_postgres()  # ✅ FIXED
     db = get_mongodb()
     recommender = get_recommender()
     
