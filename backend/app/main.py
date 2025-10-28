@@ -5,35 +5,26 @@ from .config import settings
 from .database import connect_mongodb, close_mongodb, connect_postgres, close_postgres
 from .routes import auth_routes, music_routes, recommendation_routes
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Handles startup and shutdown events for database connections."""
-    try:
-        print("🚀 Starting Music Recommender API...")
-        await connect_mongodb()
-        await connect_postgres()
-        yield
-    finally:
-        print("🛑 Shutting down...")
-        await close_mongodb()
-        await close_postgres()
+    # Startup
+    print("🚀 Starting Music Recommender API...")
+    await connect_mongodb()
+    await connect_postgres()
+    yield
+    # Shutdown
+    print("🛑 Shutting down...")
+    await close_mongodb()
+    await close_postgres()
 
-
-# ------------------------------
-# FastAPI App Initialization
-# ------------------------------
 app = FastAPI(
-    title="🎵 Music Recommender API",
-    description="Hybrid music recommendation system using content-based and collaborative filtering",
+    title="Music Recommender API",
+    description="Hybrid music recommendation system with content-based and user-based filtering",
     version="1.0.0",
-    lifespan=lifespan,
+    lifespan=lifespan
 )
 
-
-# ------------------------------
-# CORS Configuration
-# ------------------------------
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
@@ -42,27 +33,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include routers
+app.include_router(auth_routes.router)
+app.include_router(music_routes.router)
+app.include_router(recommendation_routes.router)  # This line adds recommendation routes
 
-# ------------------------------
-# Include Routers
-# ------------------------------
-app.include_router(auth_routes.router, prefix="/auth", tags=["Authentication"])
-app.include_router(music_routes.router, prefix="/music", tags=["Music"])
-app.include_router(recommendation_routes.router, prefix="/recommend", tags=["Recommendations"])
-
-
-# ------------------------------
-# Root & Health Check
-# ------------------------------
-@app.get("/", tags=["Root"])
+@app.get("/")
 async def root():
     return {
-        "message": "🎶 Music Recommender API is running!",
+        "message": "Music Recommender API",
         "version": "1.0.0",
-        "status": "active"
+        "status": "running"
     }
 
-
-@app.get("/health", tags=["Monitoring"])
+@app.get("/health")
 async def health_check():
-    return {"status": "healthy", "database": "connected"}
+    return {"status": "healthy"}
