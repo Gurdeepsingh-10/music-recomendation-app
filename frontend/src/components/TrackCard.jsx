@@ -1,6 +1,11 @@
-import { Play, Heart, SkipForward, Music2 } from 'lucide-react';
 import useMusicStore from '../store/musicStore';
 import { useState } from 'react';
+import { Card, CardContent, CardActions, Typography, IconButton, Box, Chip } from '@mui/material';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import SkipNextRoundedIcon from '@mui/icons-material/SkipNextRounded';
+import AlbumRoundedIcon from '@mui/icons-material/AlbumRounded';
+import { motion } from 'framer-motion';
 
 const TrackCard = ({ track, showScore = false }) => {
     const { playTrack, likeTrack, skipTrack } = useMusicStore();
@@ -23,88 +28,75 @@ const TrackCard = ({ track, showScore = false }) => {
     };
 
     const getScoreColor = (score) => {
-        if (score >= 0.8) return 'text-green-400';
-        if (score >= 0.6) return 'text-yellow-400';
-        return 'text-gray-400';
+        if (score >= 0.8) return 'mui-color-success';
+        if (score >= 0.6) return 'mui-color-warning';
+        return 'mui-color-muted';
     };
 
     return (
-        <div className="group bg-dark-card rounded-lg p-4 hover:bg-dark-lighter transition-smooth cursor-pointer">
-            {/* Album Art Placeholder */}
-            <div className="relative mb-4">
-                <div className="aspect-square bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center">
-                    <Music2 size={48} className="text-primary/40" />
-                </div>
+        <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 300, damping: 18 }}>
+            <Card sx={{ overflow: 'hidden' }}>
+                <Box sx={{ position: 'relative', mb: 1 }}>
+                    <Box sx={{
+                        pt: '100%',
+                        bgcolor: 'rgba(29,185,84,0.15)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderBottom: '1px solid',
+                        borderColor: 'divider'
+                    }}>
+                        <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <AlbumRoundedIcon sx={{ fontSize: 48, color: 'primary.main', opacity: 0.6 }} />
+                        </Box>
+                    </Box>
+                    <motion.div initial={{ scale: 0, opacity: 0 }} whileHover={{ scale: 1, opacity: 1 }} animate={isPlaying ? { scale: 1, opacity: 1 } : {}} style={{ position: 'absolute', right: 12, bottom: 12 }}>
+                        <IconButton color="primary" onClick={handlePlay} sx={{ bgcolor: 'primary.main', color: 'white', '&:hover': { transform: 'scale(1.08)' } }}>
+                            <PlayArrowRoundedIcon />
+                        </IconButton>
+                    </motion.div>
+                </Box>
+                <CardContent sx={{ pt: 1 }}>
+                    <Typography variant="subtitle1" noWrap fontWeight={700}>{track.title}</Typography>
+                    <Typography variant="body2" color="text.secondary" noWrap>{track.artist}</Typography>
+                    {track.genre && (
+                        <Chip size="small" label={track.genre} sx={{ mt: 1 }} />
+                    )}
 
-                {/* Play Button Overlay */}
-                <button
-                    onClick={handlePlay}
-                    className={`absolute bottom-2 right-2 bg-primary rounded-full p-3 shadow-lg transform transition-all ${isPlaying
-                        ? 'scale-100 opacity-100'
-                        : 'scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100'
-                        }`}
-                >
-                    <Play size={20} className="text-white fill-white" />
-                </button>
-            </div>
-
-            {/* Track Info */}
-            <div className="space-y-2">
-                <h3 className="font-semibold text-white truncate">{track.title}</h3>
-                <p className="text-sm text-gray-text truncate">{track.artist}</p>
-
-                {track.genre && (
-                    <span className="inline-block text-xs px-2 py-1 bg-dark rounded-full text-gray-text">
-                        {track.genre}
-                    </span>
-                )}
-
-                {/* Scores */}
-                {showScore && (
-                    <div className="space-y-1 text-xs">
-                        {track.hybrid_score !== undefined && (
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-text">Match Score:</span>
-                                <span className={`font-semibold ${getScoreColor(track.hybrid_score)}`}>
-                                    {(track.hybrid_score * 100).toFixed(0)}%
-                                </span>
-                            </div>
-                        )}
-                        {track.similarity_score !== undefined && (
-                            <div className="flex justify-between items-center">
-                                <span className="text-gray-text">Similarity:</span>
-                                <span className={`font-semibold ${getScoreColor(track.similarity_score)}`}>
-                                    {(track.similarity_score * 100).toFixed(0)}%
-                                </span>
-                            </div>
-                        )}
-                        {track.recommendation_reason && (
-                            <p className="text-gray-text italic mt-2">{track.recommendation_reason}</p>
-                        )}
-                    </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex items-center justify-between pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                        onClick={handleLike}
-                        className={`p-2 rounded-full transition-smooth ${isLiked
-                            ? 'bg-red-500 text-white'
-                            : 'bg-dark hover:bg-dark-lighter text-gray-text hover:text-white'
-                            }`}
-                    >
-                        <Heart size={18} className={isLiked ? 'fill-white' : ''} />
-                    </button>
-
-                    <button
-                        onClick={handleSkip}
-                        className="p-2 rounded-full bg-dark hover:bg-dark-lighter text-gray-text hover:text-white transition-smooth"
-                    >
-                        <SkipForward size={18} />
-                    </button>
-                </div>
-            </div>
-        </div>
+                    {showScore && (
+                        <Box sx={{ mt: 1 }}>
+                            {track.hybrid_score !== undefined && (
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                                    <Typography variant="caption" color="text.secondary">Match Score</Typography>
+                                    <Typography variant="caption" fontWeight={700} className={getScoreColor(track.hybrid_score)}>
+                                        {(track.hybrid_score * 100).toFixed(0)}%
+                                    </Typography>
+                                </Box>
+                            )}
+                            {track.similarity_score !== undefined && (
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                                    <Typography variant="caption" color="text.secondary">Similarity</Typography>
+                                    <Typography variant="caption" fontWeight={700} className={getScoreColor(track.similarity_score)}>
+                                        {(track.similarity_score * 100).toFixed(0)}%
+                                    </Typography>
+                                </Box>
+                            )}
+                            {track.recommendation_reason && (
+                                <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>{track.recommendation_reason}</Typography>
+                            )}
+                        </Box>
+                    )}
+                </CardContent>
+                <CardActions sx={{ justifyContent: 'space-between', opacity: 0.0, transition: 'opacity 200ms', '&:hover': { opacity: 1 } }}>
+                    <IconButton onClick={handleLike} color={isLiked ? 'error' : 'default'} sx={{ '&:hover': { transform: 'scale(1.08)' } }}>
+                        <FavoriteRoundedIcon />
+                    </IconButton>
+                    <IconButton onClick={handleSkip} sx={{ '&:hover': { transform: 'scale(1.08)' } }}>
+                        <SkipNextRoundedIcon />
+                    </IconButton>
+                </CardActions>
+            </Card>
+        </motion.div>
     );
 };
 

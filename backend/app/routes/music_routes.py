@@ -30,8 +30,17 @@ async def log_like(event: LikeEvent, current_user: dict = Depends(get_current_us
         "track_id": event.track_id,
         "liked_at": datetime.utcnow()
     }
+    # Idempotent like: don't error on duplicate likes
+    result = await db.likes.update_one(
+        {"user_id": like_data["user_id"], "track_id": like_data["track_id"]},
+        {"$setOnInsert": like_data},
+        upsert=True
+    )
+
+    # If document already existed, matchedCount will be 1 and no upsert
+    if getattr(result, "upserted_id", None) is None and getattr(result, "matched_count", 0) > 0:
+        return {"status": "success", "message": "Already liked"}
     
-    await db.likes.insert_one(like_data)
     return {"status": "success", "message": "Like logged"}
 
 @router.post("/skip")
