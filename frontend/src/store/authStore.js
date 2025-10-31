@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { authAPI } from '../services/api';
+import toast from 'react-hot-toast';
 
 const useAuthStore = create((set) => ({
     user: null,
@@ -13,11 +14,20 @@ const useAuthStore = create((set) => ({
         try {
             const response = await authAPI.signup(userData);
             const { access_token } = response.data;
+
             localStorage.setItem('token', access_token);
-            set({ token: access_token, isAuthenticated: true, loading: false });
+            set({
+                token: access_token,
+                isAuthenticated: true,
+                loading: false
+            });
+
+            toast.success('Welcome to MusicRec! 🎵');
             return true;
         } catch (error) {
-            set({ error: error.response?.data?.detail || 'Signup failed', loading: false });
+            const message = error.response?.data?.detail || 'Signup failed';
+            set({ error: message, loading: false });
+            toast.error(message);
             return false;
         }
     },
@@ -27,11 +37,20 @@ const useAuthStore = create((set) => ({
         try {
             const response = await authAPI.login(credentials);
             const { access_token } = response.data;
+
             localStorage.setItem('token', access_token);
-            set({ token: access_token, isAuthenticated: true, loading: false });
+            set({
+                token: access_token,
+                isAuthenticated: true,
+                loading: false
+            });
+
+            toast.success('Welcome back! 🎶');
             return true;
         } catch (error) {
-            set({ error: error.response?.data?.detail || 'Login failed', loading: false });
+            const message = error.response?.data?.detail || 'Login failed';
+            set({ error: message, loading: false });
+            toast.error(message);
             return false;
         }
     },
@@ -39,6 +58,7 @@ const useAuthStore = create((set) => ({
     logout: () => {
         localStorage.removeItem('token');
         set({ user: null, token: null, isAuthenticated: false });
+        toast.success('Logged out successfully');
     },
 
     fetchUser: async () => {
@@ -49,6 +69,8 @@ const useAuthStore = create((set) => ({
             console.error('Failed to fetch user:', error);
         }
     },
+
+    clearError: () => set({ error: null }),
 }));
 
 export default useAuthStore;

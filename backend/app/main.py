@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from .config import settings
 from .database import connect_mongodb, close_mongodb, connect_postgres, close_postgres
-from .routes import auth_routes, music_routes, recommendation_routes
+from .routes import auth_routes, music_routes, recommendation_routes, analytics_routes
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,8 +19,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Music Recommender API",
-    description="Hybrid music recommendation system with content-based and user-based filtering",
-    version="1.0.0",
+    description="Hybrid music recommendation system with analytics",
+    version="2.0.0",
     lifespan=lifespan
 )
 
@@ -36,14 +36,21 @@ app.add_middleware(
 # Include routers
 app.include_router(auth_routes.router)
 app.include_router(music_routes.router)
-app.include_router(recommendation_routes.router)  # This line adds recommendation routes
+app.include_router(recommendation_routes.router)
+app.include_router(analytics_routes.router)
 
 @app.get("/")
 async def root():
     return {
         "message": "Music Recommender API",
-        "version": "1.0.0",
-        "status": "running"
+        "version": "2.0.0",
+        "status": "running",
+        "features": [
+            "Hybrid Recommendations",
+            "User Profiling",
+            "Real-time Analytics",
+            "106K+ Real Tracks"
+        ]
     }
 
 @app.get("/health")

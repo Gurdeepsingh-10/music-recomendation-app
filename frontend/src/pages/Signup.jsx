@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Music, Mail, Lock, User, Loader } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 
 const Signup = () => {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { signup, loading, error } = useAuthStore();
+    const { signup, loading } = useAuthStore();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -18,66 +19,103 @@ const Signup = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-dark">
-            <div className="bg-secondary p-8 rounded-lg shadow-xl w-full max-w-md">
-                <h2 className="text-3xl font-bold text-white mb-6 text-center">Sign Up</h2>
-
-                {error && (
-                    <div className="bg-red-500 text-white p-3 rounded mb-4">
-                        {error}
+        <div className="min-h-screen bg-gradient-to-br from-dark via-dark-lighter to-dark flex items-center justify-center px-4">
+            <div className="max-w-md w-full">
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-primary rounded-3xl mb-4 transform hover:scale-110 transition-smooth">
+                        <Music size={40} className="text-white" />
                     </div>
-                )}
+                    <h1 className="text-4xl font-bold text-white mb-2">Join MusicRec</h1>
+                    <p className="text-gray-text">Start your personalized music journey</p>
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-gray-300 mb-2">Username</label>
-                        <input
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="w-full px-4 py-2 rounded bg-dark text-white border border-gray-700 focus:border-primary focus:outline-none"
-                            required
-                        />
+                <div className="bg-dark-card rounded-2xl p-8 shadow-2xl border border-dark-lighter">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-text mb-2">
+                                Username
+                            </label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-text" size={20} />
+                                <input
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    placeholder="johndoe"
+                                    required
+                                    className="w-full pl-10 pr-4 py-3 bg-dark rounded-lg text-white placeholder-gray-text border border-dark-lighter focus:border-primary focus:outline-none transition-smooth"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-text mb-2">
+                                Email Address
+                            </label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-text" size={20} />
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="you@example.com"
+                                    required
+                                    className="w-full pl-10 pr-4 py-3 bg-dark rounded-lg text-white placeholder-gray-text border border-dark-lighter focus:border-primary focus:outline-none transition-smooth"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-text mb-2">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-text" size={20} />
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    minLength={6}
+                                    className="w-full pl-10 pr-4 py-3 bg-dark rounded-lg text-white placeholder-gray-text border border-dark-lighter focus:border-primary focus:outline-none transition-smooth"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-text mt-1">Minimum 6 characters</p>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 rounded-lg transition-smooth flex items-center justify-center space-x-2 disabled:opacity-50"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader className="animate-spin" size={20} />
+                                    <span>Creating account...</span>
+                                </>
+                            ) : (
+                                <span>Sign Up</span>
+                            )}
+                        </button>
+                    </form>
+
+                    <div className="relative my-8">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-dark-lighter"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-4 bg-dark-card text-gray-text">Already have an account?</span>
+                        </div>
                     </div>
 
-                    <div>
-                        <label className="block text-gray-300 mb-2">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-2 rounded bg-dark text-white border border-gray-700 focus:border-primary focus:outline-none"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-gray-300 mb-2">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-2 rounded bg-dark text-white border border-gray-700 focus:border-primary focus:outline-none"
-                            required
-                            minLength={6}
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-primary text-white py-2 rounded-full hover:bg-green-600 transition disabled:opacity-50"
+                    <Link
+                        to="/login"
+                        className="block text-center w-full py-3 rounded-lg border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold transition-smooth"
                     >
-                        {loading ? 'Creating account...' : 'Sign Up'}
-                    </button>
-                </form>
-
-                <p className="text-gray-400 text-center mt-4">
-                    Already have an account?{' '}
-                    <Link to="/login" className="text-primary hover:underline">
-                        Login
+                        Log In
                     </Link>
-                </p>
+                </div>
             </div>
         </div>
     );

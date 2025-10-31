@@ -2,7 +2,6 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional
 from .config import settings
 import asyncpg
-import os 
 
 # MongoDB Connection
 mongodb_client: Optional[AsyncIOMotorClient] = None
@@ -13,11 +12,11 @@ async def connect_mongodb():
     try:
         mongodb_client = AsyncIOMotorClient(settings.MONGODB_URL)
         mongodb_db = mongodb_client.music_recommender
-        # Test connection
         await mongodb_client.admin.command('ping')
         print("✅ Connected to MongoDB")
     except Exception as e:
-        print(f"⏳ MongoDB not configured yet (will setup in Step 2)")
+        print(f"❌ MongoDB connection error: {e}")
+        raise
 
 async def close_mongodb():
     global mongodb_client
@@ -28,21 +27,24 @@ async def close_mongodb():
 def get_mongodb():
     return mongodb_db
 
-# PostgreSQL Connection Pool (using asyncpg - no compilation needed!)
+# PostgreSQL Connection Pool
 postgres_pool: Optional[asyncpg.Pool] = None
+
 async def connect_postgres():
     global postgres_pool
     try:
-        POSTGRES_URL = os.getenv("POSTGRES_URL")
-        if not POSTGRES_URL:
-            raise ValueError("❌ POSTGRES_URL not found in environment variables")
-
-        postgres_pool = await asyncpg.create_pool(dsn=POSTGRES_URL)
+        postgres_pool = await asyncpg.create_pool(
+            settings.POSTGRES_URL,
+            min_size=1,
+            max_size=10,
+            command_timeout=60
+        )
         async with postgres_pool.acquire() as conn:
-            await conn.execute("SELECT 1;")  # simple ping
+            await conn.fetchval('SELECT 1')
         print("✅ Connected to PostgreSQL (Supabase)")
     except Exception as e:
-        print(f"❌ Failed to connect to PostgreSQL: {e}")
+        print(f"❌ PostgreSQL connection error: {e}")
+        raise
 
 async def close_postgres():
     global postgres_pool
@@ -50,5 +52,5 @@ async def close_postgres():
         await postgres_pool.close()
         print("PostgreSQL connection closed")
 
-async def get_postgres():
+def get_postgres():
     return postgres_pool
